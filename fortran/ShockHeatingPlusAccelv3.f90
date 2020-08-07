@@ -14,7 +14,7 @@ program lightcurve
             difffac, efac, tauni, rho0, alpha
     double precision rstar, v0, mexp, eexp, rold
     double precision mni, mcore, etest, gam, vwind, mdot
-    character filename*13 
+    character filename*128 
     integer jedge
 
     double precision mtot, esh(2000), rw, alpha2
@@ -53,9 +53,9 @@ program lightcurve
     mdot = 2.26d26
     !alpha = 2.0d0
     
-    open(69, file=filename//'BB.dat',status='new')
-    open(79, file=filename//'prop.dat',status='new')
-    open(89, file=filename//'initial.dat',status='new')
+    open(69, file=trim(filename)//'BB.dat',status='new')
+    open(79, file=trim(filename)//'prop.dat',status='new')
+    open(89, file=trim(filename)//'initial.dat',status='new')
     102  format(5(1pe12.4), I5)
     103  format(6(1pe12.4))
     104  format(I5,5(1pe12.4))

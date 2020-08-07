@@ -16,7 +16,7 @@ implicit none
             umag,bmag,vmag,rmag
     doubleprecision lambda(100000), ev(100000),lum
     integer i, j, ijnk, ir, nzones, n
-    character*13 filename
+    character*128 filename
     h=4.13d-15 ! planck's constant in ev*s
     c=2.998d18 ! speed of light in angstrom/second
     d=10*(3.08d18) ! Distance of 10 parsecs in cm ( 1 parsec = 3.08d18 cm)
@@ -27,14 +27,14 @@ implicit none
     end do
     !...Read in BB filename and number of lines...!
     read(*,*) filename,nzones
-    open(42, file=filename//'BB.dat')
+    open(42, file=trim(filename)//'BB.dat')
       do j=1, nzones
         read(42, *) time(j), llum(j), rad(j), tphot(j), shtemp(j), &
                 jedge(j)
       end do
     close(42)
     !...Create output file for Absolute Magntidues...!
-    open(43, file=filename//'Absmag.dat')
+    open(43, file=trim(filename)//'Absmag.dat')
 
       do j=1, nzones
     !...Generates spectra for each modeled epoch...!
@@ -134,7 +134,7 @@ subroutine readUVOTresponse(lumuvw1, lumuvm2,lumuvw2,&
     doubleprecision wavelength, w1r,m2r,w2r,ur,br,vr
     doubleprecision uvw1,uvm2,uvw2,u,b,v
     integer i
-    open(45, file='C:\Users\Janie\PycharmProjects\SNeModels\UVOTResponseCurve')
+    open(45, file='/home/sslocum/school/workspaces/sne-research/SNeModel/fortran/UVOTResponseCurve')
     uvw1 = 0.0
     uvm2 = 0.0
     uvw2 = 0.0
@@ -170,7 +170,7 @@ subroutine readLSSTresponse(lumr,dmbc,lam,rmag)
     doubleprecision wavelength, rr,r,response
     integer i
      ! Read in LSST R band throughput
-    open(45, file='C:\Users\Janie\PycharmProjects\SNeModels\LSST_Rbandpass.txt')
+    open(45, file='/home/sslocum/school/workspaces/sne-research/SNeModel/fortran/LSST_Rbandpass.txt')
     r = 0.0
     do i=1, 1688
         read(45,*) wavelength, rr,response
