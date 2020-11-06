@@ -2,13 +2,14 @@ program lightcurve
     !
     implicit none
     !******* Comments through out the code
+    integer grid_sz
+    double precision, DIMENSION(:), ALLOCATABLE ::  m, energy, v,  &
+            rho, temp, edot, kappa, vshr
+    double precision, DIMENSION(:), ALLOCATABLE :: r
+    double precision, DIMENSION(:), ALLOCATABLE :: rhosh0, vsh0, tsh0
 
-    double precision m(2000), energy(2000), v(2000), r(0:2000), &
-            rho(2000), temp(2000), edot(2000), kappa(2000), vshr(2000)
-    double precision rhosh0(2000), vsh0(2000), tsh0(2000)
-
-    double precision rhosh(2000), vsh(2000), tsh(2000)
-    double precision rhoshw, rhow, brad, dr(2000)
+    double precision, DIMENSION(:), ALLOCATABLE :: rhosh, vsh, tsh, dr, factor, esh
+    double precision rhoshw, rhow, brad 
     double precision vshw, tshw, accel, msh, mw
     double precision a, pi43, pi4, sigma, &
             difffac, efac, tauni, rho0, alpha
@@ -17,18 +18,37 @@ program lightcurve
     character filename*128 
     integer jedge
 
-    double precision mtot, esh(2000), rw, alpha2
-    !
+    double precision mtot, rw, alpha2
+        !
     !-- evolution variables
     !
     double precision dt, time, rhowi
     double precision tau, lum, diff, rphot, tphot, lumt, &
             den, lums, p, tsh1, rho1, vel
-    double precision trecom, precom, factor(2000)
+    double precision trecom, precom 
     !
     integer i, j, jcore, jphot
     !
-    read(*,*) alpha,rstar,mexp,eexp,filename
+    ALLOCATE (m(grid_sz))
+    ALLOCATE (energy(grid_sz))
+    ALLOCATE (v(grid_sz))
+    ALLOCATE (r(0:grid_sz))
+    ALLOCATE (rho(grid_sz))
+    ALLOCATE (temp(grid_sz))
+    ALLOCATE (edot(grid_sz))
+    ALLOCATE (kappa(grid_sz))
+    ALLOCATE (vshr(grid_sz))
+    ALLOCATE (rhosh0(grid_sz))
+    ALLOCATE (vsh(grid_sz))
+    ALLOCATE (vsh0(grid_sz))
+    ALLOCATE (tsh0(grid_sz))
+    ALLOCATE (rhosh(grid_sz))
+    ALLOCATE (tsh(grid_sz))
+    ALLOCATE (dr(grid_sz))
+    ALLOCATE (factor(grid_sz))
+    ALLOCATE (esh(grid_sz))
+
+       read(*,*) alpha,rstar,mexp,eexp,filename
     ! rstar = 8.d12
     !mexp = 6.d34
     !eexp = 5.d51
@@ -56,6 +76,7 @@ program lightcurve
     open(69, file=trim(filename)//'BB.dat',status='new')
     open(79, file=trim(filename)//'prop.dat',status='new')
     open(89, file=trim(filename)//'initial.dat',status='new')
+    print *, "Opened files"
     102  format(5(1pe12.4), I5)
     103  format(6(1pe12.4))
     104  format(I5,5(1pe12.4))
@@ -105,7 +126,7 @@ program lightcurve
     print *, mtot
     print *, 'core zone', jcore
     print *, v0, m(2000) / 1.9d33, r(2000) - r(1999), trecom
-
+    print *, "Got past here"
    
     v0 = dsqrt(2.0 * eexp / v0)
     etest = 0.d0
@@ -118,10 +139,12 @@ program lightcurve
         energy(i) = (a * tsh0(i)**4 * pi43 * (r(i)**3 - r(i - 1)**3))
         if (mod(i, 100)==0) then
             print *, i, r(i), rho(i), tsh0(i), vsh0(i), m(i)
+        print *, "i: ", r(i)
 	    write(89, 104) i, r(i), rho(i), tsh0(i), vsh0(i), m(i)
         end if
         etest = etest + 0.5 * m(i) * v(i)**2
     end do
+    print *, "Line 146"
     close(89)
     print *, etest
     print *, 'shock temp ', tsh0(2000)
@@ -143,7 +166,7 @@ program lightcurve
     msh = 0.d0
     !**** This accel variable is defined later; from FAST RADIATION MEDIATED SHOCKS AND SUPERNOVA SHOCK BREAKOUTS
     !cccc  Boaz Katz, Ran Budnik, and Eli Waxman
-
+    print *, "Line 168"
     do i = 1, 10000000
         do j = 1, 2000
             r(j) = r(j) + vsh0(j) * accel * dt
