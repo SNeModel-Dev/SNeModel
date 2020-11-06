@@ -29,6 +29,7 @@ program lightcurve
     !
     integer i, j, jcore, jphot
     !
+    read(*,*) alpha,rstar,mexp,eexp,filename, grid_sz
     ALLOCATE (m(grid_sz))
     ALLOCATE (energy(grid_sz))
     ALLOCATE (v(grid_sz))
@@ -48,8 +49,7 @@ program lightcurve
     ALLOCATE (factor(grid_sz))
     ALLOCATE (esh(grid_sz))
 
-       read(*,*) alpha,rstar,mexp,eexp,filename
-    ! rstar = 8.d12
+        ! rstar = 8.d12
     !mexp = 6.d34
     !eexp = 5.d51
     trecom = 1.d0 * 1.16d4
@@ -57,7 +57,7 @@ program lightcurve
     mni = 2.d32
 
     mcore = mexp/10.0d0
-    do i = 1, 2000
+    do i = 1, grid_sz
         kappa(i) = 0.4d0
     end do
     pi4 = 3.14159258d0 * 4.d0
@@ -82,8 +82,8 @@ program lightcurve
     104  format(I5,5(1pe12.4))
 
     rho0 = mexp / pi4 / (rstar**(3.0d0 - alpha) - 1.d9**(3.0d0 - alpha))
-    do i = 1, 2000
-        r(i) = rstar / 2.d3 * dble(i)
+    do i = 1, grid_sz
+        r(i) = rstar / grid_sz * dble(i)
         if (i==1) then
             rho(i) = rho0 * (0.5d0 * (r(i) + 1.d9))**(-alpha)
         else
@@ -92,19 +92,19 @@ program lightcurve
     end do
     r(0) = 0.d0
     mtot = 0.d0
-    do i = 1, 2000
+    do i = 1, grid_sz
         m(i) = pi43 * rho(i) * (r(i)**3 - r(i - 1)**3)
         mtot = mtot + m(i)
     end do
     print *, mtot, mexp
-    do i = 1, 2000
+    do i = 1, grid_sz
         m(i) = m(i) * mexp / mtot
     end do
     !
     !--  The nickel is placed in the center.
     !
     mtot = 0.d0
-    do i = 1, 2000
+    do i = 1, grid_sz
         factor(i) = 1.0
         mtot = mtot + m(i)
         if (mtot<mcore) then
@@ -125,12 +125,12 @@ program lightcurve
     end do
     print *, mtot
     print *, 'core zone', jcore
-    print *, v0, m(2000) / 1.9d33, r(2000) - r(1999), trecom
+    print *, v0, m(grid_sz) / 1.9d33, r(grid_sz) - r(grid_sz-1), trecom
     print *, "Got past here"
    
     v0 = dsqrt(2.0 * eexp / v0)
     etest = 0.d0
-    do i = 1, 2000
+    do i = 1, grid_sz
         v(i) = v0 * r(i)
         rhosh0(i) = ((gam + 1) / (gam - 1)) * rho(i)
         vsh0(i) = v(i) * (rho(i) / rhosh0(i))**(-0.19)
@@ -147,7 +147,7 @@ program lightcurve
     print *, "Line 146"
     close(89)
     print *, etest
-    print *, 'shock temp ', tsh0(2000)
+    print *, 'shock temp ', tsh0(grid_sz)
 
 
     
@@ -155,24 +155,24 @@ program lightcurve
     time = 0.d0
     dt = 1.0
     lumt = 0.d0
-    jedge = 2000
-    jphot = 2000
+    jedge = grid_sz
+    jphot = grid_sz
     lums = 0.d0
     rhosh = 0.d0
     rhow = 0.d0
     vshw = 0.d0
     accel = 1.0
-    rho1 = rho(2000)
+    rho1 = rho(grid_sz)
     msh = 0.d0
     !**** This accel variable is defined later; from FAST RADIATION MEDIATED SHOCKS AND SUPERNOVA SHOCK BREAKOUTS
     !cccc  Boaz Katz, Ran Budnik, and Eli Waxman
     print *, "Line 168"
     do i = 1, 10000000
-        do j = 1, 2000
+        do j = 1, grid_sz
             r(j) = r(j) + vsh0(j) * accel * dt
             rho(j) = m(j) / pi43 / (r(j)**3 - r(j - 1)**3)
         end do
-        do j = 1, 2000
+        do j = 1, grid_sz
             if (energy(j)<1.d0) then
                 temp(j) = 0.0
             else
@@ -195,7 +195,7 @@ program lightcurve
                 energy(j) = energy(j) + diff * dt
             end if
         end do
-        do j = 1, 2000
+        do j = 1, grid_sz
             if (edot(j)>0) then
                 energy(j) = energy(j) + edot(j) * dexp(-time / tauni) * dt
             end if
@@ -203,13 +203,13 @@ program lightcurve
         tau = 0.d0
         lum = 0.d0
 
-        do j = 1, 2000
+        do j = 1, grid_sz
             rhosh(j) = ((gam + 1) / (gam - 1)) * rho(j)
             vsh(j) = (rho(j) * vsh0(j) * accel) / rhosh(j)
             tsh(j) = (((3 / 2) * (gam + 1) / a) * rhosh(j) * vsh(j)**2)**0.25
             esh(j) = ((a * tsh(j)**4) * pi43 * (r(j)**3 - r(j - 1)**3))
         end do
-        do j = 2000, 1, -1
+        do j = grid_sz, 1, -1
             tau = tau + rho(j) * kappa(j) * factor(j) * (r(j) - r(j - 1))
             rhow = mdot / (pi4 * r(j)**2 * vwind)
             mw = pi4 * r(j)**2 * tau / kappa(j)
@@ -262,7 +262,7 @@ program lightcurve
         lums = 0.d0
         time = time + dt
         if (mod(i, 10000)==0) then
-            print *, 'Lum', tau, time / 3600. / 24., lumt / 10000.d0, esh(2000)
+            print *, 'Lum', tau, time / 3600. / 24., lumt / 10000.d0, esh(grid_sz)
             write(69, 102) time / 3600. / 24., dlog10(lumt / 10000.d0 + 1.d-5), &
                     rphot, tphot, tsh(j), jedge
             write(79, 103) (time / 3600. / 24.), den, tau, vel, msh, rhow
