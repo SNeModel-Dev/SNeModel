@@ -11,21 +11,25 @@ program spec
     !      double precision taux,trecom
     double precision lambda(8000), ev(8000)
     integer i, j, ijnk, ir, nzones, n
-    character*13 filename
-
+    character*32 filename
+    print *, 'about to read filename and zones'
     read(*,*) filename,nzones
+    print *, "read in filename"
     open(42, file=filename//'BB.dat')
     open(43, file=filename//'spect.dat')
     h=4.13d-15
     c=2.998d18
-    lam=100.25
+    ! lam=100.25
+    ! Changing lam to match previous verions
+    lam=10.25
+    print *,"About to build lambdas"
     do n=1, 8000
         lambda(n)=lam + 0.75 * dble(n)
         ev(n)=(h * c) / lambda(n)
     end do
-
+    print *,"Finished building lambdas"
     print *, lambda(8000), lambda(1), ev(1), ev(8000)
-
+    print *,"Going to iterate over the zones"
     do j=1, nzones
         read(42, *) time, llum, djnk, tphot, tempdc, &
                 jedge
