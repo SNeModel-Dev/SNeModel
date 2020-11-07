@@ -30,6 +30,7 @@ program lightcurve
     integer i, j, jcore, jphot
     !
     read(*,*) alpha,rstar,mexp,eexp,filename, grid_sz
+    print *, grid_sz
     ALLOCATE (m(grid_sz))
     ALLOCATE (energy(grid_sz))
     ALLOCATE (v(grid_sz))
