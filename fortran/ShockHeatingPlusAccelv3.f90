@@ -154,7 +154,7 @@ program lightcurve
     
 
     time = 0.d0
-    dt = 1.0
+    dt = 2000d0 / grid_sz
     lumt = 0.d0
     jedge = grid_sz
     jphot = grid_sz
