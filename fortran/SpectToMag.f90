@@ -134,7 +134,7 @@ subroutine readUVOTresponse(lumuvw1, lumuvm2,lumuvw2,&
     doubleprecision wavelength, w1r,m2r,w2r,ur,br,vr
     doubleprecision uvw1,uvm2,uvw2,u,b,v
     integer i
-    open(45, file='/home/sslocum/school/workspaces/sne-research/SNeModel/fortran/UVOTResponseCurve')
+    open(45, file='/home/sslocum/workspaces/school/supernova/src/SNeModel/fortran/UVOTResponseCurve')
     uvw1 = 0.0
     uvm2 = 0.0
     uvw2 = 0.0
@@ -170,7 +170,7 @@ subroutine readLSSTresponse(lumr,dmbc,lam,rmag)
     doubleprecision wavelength, rr,r,response
     integer i
      ! Read in LSST R band throughput
-    open(45, file='/home/sslocum/school/workspaces/sne-research/SNeModel/fortran/LSST_Rbandpass.txt')
+    open(45, file='/home/sslocum/workspaces/school/supernova/src/SNeModel/fortran/LSST_Rbandpass.txt')
     r = 0.0
     do i=1, 1688
         read(45,*) wavelength, rr,response
