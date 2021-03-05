@@ -3,6 +3,7 @@ program lightcurve
     implicit none
     !******* Comments through out the code
     integer grid_sz
+    double precision ni_mass_gm
     double precision, DIMENSION(:), ALLOCATABLE ::  m, energy, v,  &
             rho, temp, edot, kappa, vshr
     double precision, DIMENSION(:), ALLOCATABLE :: r
@@ -29,7 +30,7 @@ program lightcurve
     !
     integer i, j, jcore, jphot
     !
-    read(*,*) alpha,rstar,mexp,eexp,filename, grid_sz
+    read(*,*) alpha,rstar,mexp,eexp,filename, grid_sz, ni_mass_gm
     print *, grid_sz
     ALLOCATE (m(grid_sz))
     ALLOCATE (energy(grid_sz))
@@ -55,7 +56,8 @@ program lightcurve
     !eexp = 5.d51
     trecom = 1.d0 * 1.16d4
     precom = 0.25d0
-    mni = 2.d32
+!   .1 solar masses of Ni
+    mni = ni_mass_gm
 
     mcore = mexp/10.0d0
     do i = 1, grid_sz
@@ -168,7 +170,7 @@ program lightcurve
     !**** This accel variable is defined later; from FAST RADIATION MEDIATED SHOCKS AND SUPERNOVA SHOCK BREAKOUTS
     !cccc  Boaz Katz, Ran Budnik, and Eli Waxman
     print *, "Line 168"
-    do i = 1, 10000000
+    do i = 1, 10000000 * (grid_sz/1000)
         do j = 1, grid_sz
             r(j) = r(j) + vsh0(j) * accel * dt
             rho(j) = m(j) / pi43 / (r(j)**3 - r(j - 1)**3)
@@ -269,6 +271,8 @@ program lightcurve
             write(79, 103) (time / 3600. / 24.), den, tau, vel, msh, rhow
             lumt = 0.d0
         end if
+        ! End when we get to 200 days
+        ! May also end if we run out of i before we get to 200 days
         if (time>200. * 3600. * 24.) then
             stop
         end if
